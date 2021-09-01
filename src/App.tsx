@@ -102,14 +102,14 @@ const App: React.FC = () => {
         </div>
         <div className="table-wrapper">
           <form className="message-form" onSubmit={onSubmit}>
-            Name:
+            Imię:
             <input
               required
               className="name-input"
               onChange={onChangeName}
               value={name}
             />
-            Surname:
+            Nazwisko:
             <input
               required
               className="surname-input"
@@ -117,7 +117,7 @@ const App: React.FC = () => {
               value={surname}
             />
             <button disabled={!isActive} type="submit">
-              SEND
+              Dodaj
             </button>
           </form>
           {/*//TODO grid*/}
