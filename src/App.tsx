@@ -1,12 +1,16 @@
-import React, { ChangeEvent, SyntheticEvent, useEffect } from 'react'
+import React, {
+  ChangeEvent,
+  createRef,
+  SyntheticEvent,
+  useEffect,
+} from 'react'
 import './App.css'
 
 const App: React.FC = () => {
   const [name, setName] = React.useState('')
   const [surname, setSurname] = React.useState('')
   const [isActive, setIsActive] = React.useState(true)
-
-  const [fullNames, setFullName] = React.useState<
+  const [fullNames, setFullNames] = React.useState<
     {
       name: string
       surname: string
@@ -14,10 +18,19 @@ const App: React.FC = () => {
   >([{ name: '', surname: '' }])
 
   useEffect(() => {
-    if (fullNames.length > 5) {
-      setIsActive(false)
-    }
+    setIsActive(!(fullNames.length > 5))
   }, [fullNames])
+
+  const elRefs = React.useRef([])
+
+  if (elRefs.current.length !== 6) {
+    // add or remove refs
+    elRefs.current = Array(6)
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      .fill()
+      .map((_, i) => elRefs.current[i] || createRef())
+  }
 
   const onChangeName = (e: ChangeEvent<HTMLInputElement>) => {
     e.preventDefault()
@@ -32,12 +45,24 @@ const App: React.FC = () => {
   const removeTodo = (index: number) => {
     const newNames = [...fullNames]
     newNames.splice(index, 1)
-    setFullName(newNames)
+    setFullNames(newNames)
+  }
+
+  const onMouseOver = (key: number) => {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    elRefs.current[key].current.style.backgroundColor = 'red'
+  }
+
+  const onMouseLeave = (key: number) => {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    elRefs.current[key].current.style.backgroundColor = 'transparent'
   }
 
   const onSubmit = (e: SyntheticEvent) => {
     e.preventDefault()
-    setFullName((names) => [...names, { name: name, surname: surname }])
+    setFullNames((names) => [...names, { name: name, surname: surname }])
 
     setName('')
     setSurname('')
@@ -46,11 +71,19 @@ const App: React.FC = () => {
   const namesElements = fullNames.map((item, key) => {
     if (!item.name || !item.surname) return <></>
     return (
-      <div key={key}>
-        <div>
+      <div style={{ display: 'flex' }} key={key}>
+        <div ref={elRefs.current[key]}>
           {item.name} {item.surname}
         </div>
-        <button onClick={() => removeTodo(key)}>usuń</button>
+
+        <button
+          onMouseLeave={() => onMouseLeave(key)}
+          onMouseOver={() => onMouseOver(key)}
+          style={{ marginLeft: '10px' }}
+          onClick={() => removeTodo(key)}
+        >
+          usuń
+        </button>
       </div>
     )
   })
@@ -87,13 +120,11 @@ const App: React.FC = () => {
               SEND
             </button>
           </form>
-
-          {namesElements && (
-            <div>
-              <div className="box1">Pracownicy</div>
-              {namesElements}
-            </div>
-          )}
+          {/*//TODO grid*/}
+          <div>
+            <div className="box1">Pracownicy</div>
+            {namesElements}
+          </div>
         </div>
       </div>
 
